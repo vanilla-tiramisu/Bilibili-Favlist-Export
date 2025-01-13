@@ -1,20 +1,22 @@
 <div align="center">
 
-#  <img src="https://www.bilibili.com/favicon.ico" width="30" height="30" style="vertical-align: text-bottom;">  <a href="https://greasyfork.org/zh-CN/scripts/487532-%E5%93%94%E5%93%A9%E5%93%A9%E5%93%A9%E5%93%A9%E6%94%B6%E8%97%8F%E5%A4%B9%E5%AF%BC%E5%87%BA" style="text-decoration: none;"> Bilibili-Favlist-Export </a>
+#  <img src="https://www.bilibili.com/favicon.ico" width="30" height="30" style="vertical-align: text-bottom;">  <a href="https://greasyfork.org/zh-CN/scripts/523629-%E9%80%82%E9%85%8D%E6%96%B0%E7%89%88%E9%A1%B5%E9%9D%A2-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%94%B6%E8%97%8F%E5%A4%B9%E5%AF%BC%E5%87%BA" style="text-decoration: none;"> Bilibili-Favlist-Export </a>
 
-#### **简体中文** | <a href="https://github.com/AHCorn/Bilibili-Favlist-Export/blob/main/README_EN.md"> English </a>
+#### **简体中文** | <a href="https://github.com/vanilla-tiramisu/Bilibili-Favlist-Export/blob/main/README_EN.md"> English </a>
 
-导出哔哩哔哩收藏夹为 CSV 或 HTML 文件，以便导入 Raindrop 或 Firefox
-
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![GitHub stars](https://img.shields.io/github/stars/AHCorn/Bilibili-Favlist-Export?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/AHCorn/Bilibili-Favlist-Export?style=for-the-badge)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/AHCorn/Bilibili-Favlist-Export?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/AHCorn/Bilibili-Favlist-Export?style=for-the-badge)
+导出**新版页面下的**哔哩哔哩收藏夹为 CSV 或 HTML 文件，以便导入 Raindrop 或 Firefox。
 
 </div>
 
 <br>
+
+## 👀说明
+
+本项目基于[AHCorn/Bilibili-Favlist-Export](https://github.com/AHCorn/Bilibili-Favlist-Export)进行修改，非常感谢原作者的贡献。原项目提供了坚实的基础，使得本项目成为可能。若对从旧版bilibili页面导出收藏夹有需求，可了解该项目。
+
+新版收藏夹页面参考：
+
+![新版页面](image.png)
 
 ## ⚠ 用前须知
 
@@ -65,6 +67,20 @@ function escapeCSV(field) {
     return '"' + String(field).replace(/"/g, '""') + '"';
 }
 
+function parseTime(timeText) {
+    if (timeText.includes("刚刚") || timeText.includes("小时前")) {
+        return new Date().toISOString().slice(0, 10);
+    }
+    else if (timeText.match(/\d{2}-\d{2}/)) {
+        if (timeText.match(/\d{4}-\d{2}-\d{2}/)) {
+            return timeText.match(/\d{4}-\d{2}-\d{2}/)[0];
+        }
+        else {
+            return new Date().getFullYear() + "-" + timeText.match(/\d{2}-\d{2}/)[0];
+        }
+    }
+}
+
 function getVideosFromPage() {
     var results = [];
     var folderName = getFolderName().replace(/\//g, '\\');
@@ -88,7 +104,7 @@ function getVideosFromPage() {
                     title = titleElement.title.replace(/,/g, '');
                 }
             }
-            var created = timeText.trim().split("·").slice(-1)[0].trim().slice(3);
+            var created = parseTime(timeText.trim().split("·").slice(-1)[0].trim());
             results.push(escapeCSV(folderName) + ',' + escapeCSV(title) + ',' + escapeCSV(url) + ',' + escapeCSV(created));
         }
     });
@@ -154,6 +170,7 @@ changeList();
 
 
 ## ❤️ 感谢
+
 原始获取代码来自于 [快速导出B站收藏单节目列表 - 鱼肉真好吃](https://www.cnblogs.com/toumingbai/p/11399238.html)
 
 遍历所有收藏夹部分的代码来自于 [BiliBackup](https://github.com/sweatran/BiliBackup?tab=readme-ov-file)

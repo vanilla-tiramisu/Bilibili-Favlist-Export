@@ -6,7 +6,7 @@
 // @version      3.0.0
 // @license      GPL-3.0
 // @description  （适配新版页面）导出哔哩哔哩收藏夹为 CSV 或 HTML 文件，以便导入 Raindrop 或 Firefox。
-// @author       AHCorn, vanilla-tiramisu
+// @author       vanilla-tiramisu
 // @match        http*://space.bilibili.com/*/*
 // @grant        GM_addStyle
 // @grant        GM_download
@@ -358,7 +358,17 @@
     }
 
     function parseTime(timeText) {
-        return timeText.slice(3);
+        if (timeText.includes("刚刚") || timeText.includes("小时前")) {
+            return new Date().toISOString().slice(0, 10);
+        }
+        else if (timeText.match(/\d{2}-\d{2}/)) {
+            if (timeText.match(/\d{4}-\d{2}-\d{2}/)) {
+                return timeText.match(/\d{4}-\d{2}-\d{2}/)[0];
+            }
+            else {
+                return new Date().getFullYear() + "-" + timeText.match(/\d{2}-\d{2}/)[0];
+            }
+        }
     }
 
     function getVideosFromPage() {

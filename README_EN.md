@@ -1,14 +1,22 @@
 <div align="center">
 
-# 🚛 Bilibili-Favlist-Export
+#  <img src="https://www.bilibili.com/favicon.ico" width="30" height="30" style="vertical-align: text-bottom;">  <a href="https://greasyfork.org/zh-CN/scripts/523629-%E9%80%82%E9%85%8D%E6%96%B0%E7%89%88%E9%A1%B5%E9%9D%A2-%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E6%94%B6%E8%97%8F%E5%A4%B9%E5%AF%BC%E5%87%BA" style="text-decoration: none;"> Bilibili-Favlist-Export </a>
 
-### <a href="https://github.com/AHCorn/Bilibili-Favlist-Export/"> Simplified Chinese </a>  / English 
+### <a href="https://github.com/vanilla-tiramisu/Bilibili-Favlist-Export/"> Simplified Chinese </a>  / English 
 
-Export Bilibili favorites to CSV or HTML files for importing into Raindrop or Firefox.
+Export Bilibili favorites to CSV or HTML files for importing into Raindrop or Firefox. **Adapted for the new favorites page.**
 
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) 
 
 </div>
+
+## 👀 Description
+
+This project is modified from [AHCorn/Bilibili-Favlist-Export](https://github.com/AHCorn/Bilibili-Favlist-Export). Special thanks to the original author, whose contribution provided foundation that made this project possible. If you have the need of exporting favorites from the old Bilibili page, you can refer to that project.
+
+FYI, The new-version favorites page looks like:
+
+![new-version](image.png)
 
 ## ⚠ Warm Tips
 The script's preferred download function has only been tested with the **Tampermonkey** extension in the Vivaldi browser.
@@ -63,6 +71,20 @@ function escapeCSV(field) {
     return '"' + String(field).replace(/"/g, '""') + '"';
 }
 
+function parseTime(timeText) {
+    if (timeText.includes("刚刚") || timeText.includes("小时前")) {
+        return new Date().toISOString().slice(0, 10);
+    }
+    else if (timeText.match(/\d{2}-\d{2}/)) {
+        if (timeText.match(/\d{4}-\d{2}-\d{2}/)) {
+            return timeText.match(/\d{4}-\d{2}-\d{2}/)[0];
+        }
+        else {
+            return new Date().getFullYear() + "-" + timeText.match(/\d{2}-\d{2}/)[0];
+        }
+    }
+}
+
 function getVideosFromPage() {
     var results = [];
     var folderName = getFolderName().replace(/\//g, '\\');
@@ -86,7 +108,7 @@ function getVideosFromPage() {
                     title = titleElement.title.replace(/,/g, '');
                 }
             }
-            var created = timeText.trim().split("·").slice(-1)[0].trim().slice(3);
+            var created = parseTime(timeText.trim().split("·").slice(-1)[0].trim());
             results.push(escapeCSV(folderName) + ',' + escapeCSV(title) + ',' + escapeCSV(url) + ',' + escapeCSV(created));
         }
     });
